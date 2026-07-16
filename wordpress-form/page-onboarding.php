@@ -12,87 +12,15 @@
  * - Performance optimization (Lighthouse-ready)
  */
 
-// Enqueue scripts and styles
-add_action( 'wp_enqueue_scripts', function() {
-    if ( is_page_template( 'onboarding-form-template.php' ) ) {
-        // Inline critical CSS to avoid render-blocking
-        wp_enqueue_style( 'onboarding-critical', get_template_directory_uri() . '/css/onboarding-critical.css', array(), '1.0.0' );
-        
-        // Defer non-critical JS
-        wp_enqueue_script( 'onboarding-form', get_template_directory_uri() . '/js/onboarding-form.js', array(), '1.0.0', true );
-        wp_localize_script( 'onboarding-form', 'onboardingAjax', array(
-            'ajaxurl'  => admin_url( 'admin-ajax.php' ),
-            'nonce'    => wp_create_nonce( 'onboarding_nonce' ),
-        ));
-    }
-});
 
-// AJAX handler for form submission
-add_action( 'wp_ajax_nopriv_onboarding_submit', 'handle_onboarding_submission' );
-add_action( 'wp_ajax_onboarding_submit', 'handle_onboarding_submission' );
 
-function handle_onboarding_submission() {
-    // Verify nonce for security
-    check_ajax_referer( 'onboarding_nonce', 'nonce', true );
 
-    // Retrieve and validate input
-    $name     = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
-    $email    = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : '';
-    $location = isset( $_POST['location'] ) ? sanitize_text_field( $_POST['location'] ) : '';
-
-    // Validation
-    $errors = array();
-
-    if ( empty( $name ) ) {
-        $errors[] = 'Name is required.';
-    }
-
-    if ( empty( $email ) || ! is_email( $email ) ) {
-        $errors[] = 'Valid email is required.';
-    }
-
-    if ( empty( $location ) ) {
-        $errors[] = 'Location selection is required.';
-    }
-
-    // Return validation errors
-    if ( ! empty( $errors ) ) {
-        wp_send_json_error( array(
-            'message' => 'Validation failed.',
-            'errors'  => $errors,
-        ) );
-    }
-
-    // Sanitize for storage
-    $data = array(
-        'name'      => esc_attr( $name ),
-        'email'     => esc_attr( $email ),
-        'location'  => esc_attr( $location ),
-        'timestamp' => current_time( 'mysql' ),
-    );
-
-    // Simulate webhook payload to third-party CRM
-    $webhook_payload = json_encode( $data );
-    $webhook_log = WP_CONTENT_DIR . '/webhook-log.txt';
-
-    // Log webhook (in production, this would POST to external CRM endpoint)
-    error_log( "Webhook Payload: " . $webhook_payload, 3, $webhook_log );
-
-    // Alternative: Make actual HTTP request to CRM (commented out for sandbox)
-    // wp_remote_post( 'https://api.example-crm.com/webhook', array(
-    //     'body'    => $webhook_payload,
-    //     'headers' => array( 'Content-Type' => 'application/json' ),
-    // ));
-
-    // Return success response
-    wp_send_json_success( array(
-        'message' => 'Thank you! Your application has been submitted successfully.',
-        'data'    => $data,
-    ) );
-}
 
 get_header();
 ?>
+
+
+
 
 <main id="main" class="site-main">
     <div class="container">
