@@ -18,11 +18,13 @@ This is a production-ready, security-hardened multi-step form component for Word
 
 ```
 onboarding-form/
-├── onboarding-form-template.php    # Custom page template with PHP logic
+├── page-onboarding.php    # Custom page template with PHP logic
 ├── css/
 │   └── onboarding-critical.css     # Optimized critical rendering CSS
 ├── js/
-│   └── onboarding-form.js          # Client-side form handler & validation
+│   └── onboarding-form.js
+├── inc/
+│   └── ajax-handler.php          # Client-side form handler & validation
 └── README.md                       # This file
 ```
 
