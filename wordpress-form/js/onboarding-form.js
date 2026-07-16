@@ -219,7 +219,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }),
             });
 
-            const result = await response.json();
+
+const text = await response.text();
+
+console.log(text);
+
+const result = JSON.parse(text);
+
 
             submitBtn.classList.remove('loading');
             submitBtn.disabled = false;
