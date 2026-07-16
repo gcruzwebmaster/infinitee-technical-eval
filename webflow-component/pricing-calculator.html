@@ -1,1 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Calculator - Responsive Component</title>
+    <style>
+        /* ============================================
+           PRICING CALCULATOR - BEM ARCHITECTURE
+           Production-ready, Lighthouse optimized
+           ============================================ */
 
+        :root {
+            --color-primary: #2563eb;
+            --color-primary-dark: #1e40af;
+            --color-secondary: #8b5cf6;
+            --color-success: #10b981;
+            --color-bg-light: #f9fafb;
+            --color-bg-white: #ffffff;
+            --color-text-dark: #1f2937;
+            --color-text-muted: #6b7280;
+            --color-border: #e5e7eb;
+            --color-shadow: rgba(0, 0, 0, 0.1);
+            
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 1rem;
+            --spacing-md: 1.5rem;
+            --spacing-lg: 2rem;
+            --spacing-xl: 3rem;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            --font-size-base: 16px;
+            --line-height-base: 1.6;
+            
+            --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family-base);
+            font-size: var(--font-size-base);
+            line-height: var(--line-height-base);
+            color: var(--color-text-dark);
+            background: var(--color-bg-light);
+        }
+
+        /* ============================================
+           CONTAINER & LAYOUT
+           ============================================ */
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: var(--spacing-md);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: var(--spacing-sm);
+            }
+        }
+
+        /* ============================================
+           PRICING SECTION - BEM STRUCTURE
+           ============================================ */
+
+        .pricing-section {
+            background: var(--color-bg-white);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            box-shadow: 0 1px 3px var(--color-shadow);
+        }
+
+        .pricing-section__header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .pricing-section__title {
+            font-size: clamp(1.875rem, 5vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: var(--color-text-dark);
+        }
+
+        .pricing-section__subtitle {
+            font-size: 1.125rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        /* ============================================
+           BILLING TOGGLE - TAB NAVIGATION
+           ============================================ */
+
+        .billing-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+            flex-wrap: wrap;
+        }
+
+        .billing-toggle__label {
+            font-weight: 600;
+            color: var(--color-text-muted);
+            user-select: none;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .billing-toggle__label--active {
+            color: var(--color-primary);
+        }
+
+        .billing-toggle__switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+            background: var(--color-border);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: var(--transition-base);
+        }
+
+        .billing-toggle__switch.active {
+            background: var(--color-primary);
+        }
+
+        .billing-toggle__toggle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 28px;
+            height: 28px;
+            background: var(--color-bg-white);
+            border-radius: 50%;
+            transition: var(--transition-base);
+            box-shadow: 0 2px 4px var(--color-shadow);
+        }
+
+        .billing-toggle__switch.active .billing-toggle__toggle {
+            transform: translateX(28px);
+        }
+
+        .billing-toggle__badge {
+            display: inline-block;
+            background: var(--color-success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: var(--spacing-xs);
+        }
+
+        /* ============================================
+           PRICING SLIDER & DISPLAY
+           ============================================ */
+
+        .pricing-slider {
+            background: var(--color-bg-light);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .pricing-slider__label {
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--color-text-dark);
+            display: block;
+        }
+
+        .pricing-slider__range {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--color-border);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .pricing-slider__range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            cursor: pointer;
+            transition: var(--transition-base);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .pricing-slider__range::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .pricing-slider__range::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            cursor: pointer;
+            border: none;
+            transition: var(--transition-base);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .pricing-slider__range::-moz-range-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .pricing-slider__values {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-md);
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .pricing-slider__value {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pricing-slider__value-label {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            margin-bottom: 4px;
+        }
+
+        .pricing-slider__value-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        /* ============================================
+           PRICING CARDS GRID - RESPONSIVE
+           ============================================ */
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        @media (max-width: 768px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+                gap: var(--spacing-md);
+            }
+        }
+
+        .pricing-card {
+            background: var(--color-bg-white);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            transition: var(--transition-base);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--color-primary);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .pricing-card--featured {
+            border-color: var(--color-primary);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            transform: scale(1.02);
+        }
+
+        .pricing-card--featured:hover {
+            transform: scale(1.02) translateY(-4px);
+            box-shadow: 0 12px 32px rgba(37, 99, 235, 0.2);
+        }
+
+        .pricing-card__badge {
+            position: absolute;
+            top: -8px;
+            right: 16px;
+            background: var(--color-secondary);
+            color: white;
+            padding: 4px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .pricing-card__name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            margin-top: var(--spacing-md);
+            color: var(--color-text-dark);
+        }
+
+        .pricing-card__description {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            margin-bottom: var(--spacing-lg);
+            min-height: 40px;
+        }
+
+        .pricing-card__price {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .pricing-card__amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .pricing-card__currency {
+            font-size: 1.25rem;
+            color: var(--color-text-muted);
+        }
+
+        .pricing-card__period {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        .pricing-card__features {
+            list-style: none;
+            margin-bottom: var(--spacing-lg);
+            flex: 1;
+        }
+
+        .pricing-card__feature {
+            padding: var(--spacing-xs) 0;
+            font-size: 0.925rem;
+            color: var(--color-text-dark);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .pricing-card__feature::before {
+            content: '✓';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background: var(--color-success);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .pricing-card__cta {
+            display: block;
+            width: 100%;
+            padding: var(--spacing-md);
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-base);
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .pricing-card__cta:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .pricing-card__cta:active {
+            transform: translateY(0);
+        }
+
+        .pricing-card--featured .pricing-card__cta {
+            background: var(--color-secondary);
+        }
+
+        .pricing-card--featured .pricing-card__cta:hover {
+            background: #7c3aed;
+        }
+
+        /* ============================================
+           FAQ SECTION
+           ============================================ */
+
+        .faq-section {
+            background: var(--color-bg-light);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+
+        .faq-section__title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-lg);
+            color: var(--color-text-dark);
+        }
+
+        .faq-item {
+            background: var(--color-bg-white);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .faq-item__question {
+            font-weight: 600;
+            color: var(--color-text-dark);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .faq-item__answer {
+            font-size: 0.925rem;
+            color: var(--color-text-muted);
+            line-height: 1.8;
+        }
+
+        /* ============================================
+           RESPONSIVE MOBILE FIRST
+           ============================================ */
+
+        @media (max-width: 640px) {
+            .container {
+                padding: var(--spacing-md);
+            }
+
+            .pricing-section {
+                padding: var(--spacing-lg);
+            }
+
+            .pricing-section__title {
+                font-size: 1.5rem;
+            }
+
+            .pricing-section__subtitle {
+                font-size: 1rem;
+            }
+
+            .billing-toggle {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card {
+                padding: var(--spacing-md);
+            }
+
+            .pricing-slider {
+                padding: var(--spacing-md);
+            }
+
+            .pricing-card__amount {
+                font-size: 1.5rem;
+            }
+
+            .faq-section {
+                padding: var(--spacing-md);
+            }
+
+            .faq-section__title {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* ============================================
+           ACCESSIBILITY
+           ============================================ */
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        button:focus-visible,
+        input:focus-visible {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <section class="pricing-section">
+            <!-- Header -->
+            <div class="pricing-section__header">
+                <h1 class="pricing-section__title">Simple, Transparent Pricing</h1>
+                <p class="pricing-section__subtitle">Choose the plan that works best for your needs</p>
+            </div>
+
+            <!-- Billing Toggle (Monthly / Annual) -->
+            <div class="billing-toggle">
+                <label class="billing-toggle__label billing-toggle__label--active" for="billingMonthly">
+                    Monthly
+                </label>
+                <div class="billing-toggle__switch active" id="billingSwitch">
+                    <div class="billing-toggle__toggle"></div>
+                </div>
+                <label class="billing-toggle__label" for="billingAnnual">
+                    Annual
+                    <span class="billing-toggle__badge">Save 20%</span>
+                </label>
+                <input type="radio" id="billingMonthly" name="billing" value="monthly" checked hidden />
+                <input type="radio" id="billingAnnual" name="billing" value="annual" hidden />
+            </div>
+
+            <!-- Pricing Slider -->
+            <div class="pricing-slider">
+                <label class="pricing-slider__label" for="quantitySlider">
+                    Adjust Usage / Team Size
+                </label>
+                <input 
+                    type="range" 
+                    id="quantitySlider" 
+                    class="pricing-slider__range"
+                    min="1" 
+                    max="100" 
+                    value="10"
+                    aria-label="Adjust pricing based on usage"
+                />
+                <div class="pricing-slider__values">
+                    <div class="pricing-slider__value">
+                        <span class="pricing-slider__value-label">Users</span>
+                        <span class="pricing-slider__value-amount" id="usersDisplay">10</span>
+                    </div>
+                    <div class="pricing-slider__value">
+                        <span class="pricing-slider__value-label">Est. Monthly</span>
+                        <span class="pricing-slider__value-amount" id="totalDisplay">$290</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing Cards Grid -->
+            <div class="pricing-grid">
+                <!-- Starter Plan -->
+                <div class="pricing-card">
+                    <h3 class="pricing-card__name">Starter</h3>
+                    <p class="pricing-card__description">Perfect for small teams just getting started</p>
+                    <div class="pricing-card__price">
+                        <span class="pricing-card__currency">$</span>
+                        <span class="pricing-card__amount" id="starterPrice">29</span>
+                        <span class="pricing-card__period">/month</span>
+                    </div>
+                    <ul class="pricing-card__features">
+                        <li class="pricing-card__feature">Up to 3 users</li>
+                        <li class="pricing-card__feature">5 projects</li>
+                        <li class="pricing-card__feature">2 GB storage</li>
+                        <li class="pricing-card__feature">Email support</li>
+                    </ul>
+                    <button class="pricing-card__cta">Get Started</button>
+                </div>
+
+                <!-- Pro Plan (Featured) -->
+                <div class="pricing-card pricing-card--featured">
+                    <span class="pricing-card__badge">Most Popular</span>
+                    <h3 class="pricing-card__name">Pro</h3>
+                    <p class="pricing-card__description">For growing teams and power users</p>
+                    <div class="pricing-card__price">
+                        <span class="pricing-card__currency">$</span>
+                        <span class="pricing-card__amount" id="proPrice">79</span>
+                        <span class="pricing-card__period">/month</span>
+                    </div>
+                    <ul class="pricing-card__features">
+                        <li class="pricing-card__feature">Up to 15 users</li>
+                        <li class="pricing-card__feature">Unlimited projects</li>
+                        <li class="pricing-card__feature">100 GB storage</li>
+                        <li class="pricing-card__feature">Priority support</li>
+                        <li class="pricing-card__feature">Advanced analytics</li>
+                    </ul>
+                    <button class="pricing-card__cta">Start Free Trial</button>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="pricing-card">
+                    <h3 class="pricing-card__name">Enterprise</h3>
+                    <p class="pricing-card__description">Custom solutions for large organizations</p>
+                    <div class="pricing-card__price">
+                        <span class="pricing-card__currency">$</span>
+                        <span class="pricing-card__amount" id="enterprisePrice">199</span>
+                        <span class="pricing-card__period">/month</span>
+                    </div>
+                    <ul class="pricing-card__features">
+                        <li class="pricing-card__feature">Unlimited users</li>
+                        <li class="pricing-card__feature">Unlimited projects</li>
+                        <li class="pricing-card__feature">Unlimited storage</li>
+                        <li class="pricing-card__feature">24/7 phone support</li>
+                        <li class="pricing-card__feature">Custom integrations</li>
+                    </ul>
+                    <button class="pricing-card__cta">Contact Sales</button>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="faq-section">
+                <h2 class="faq-section__title">Frequently Asked Questions</h2>
+                
+                <div class="faq-item">
+                    <p class="faq-item__question">Can I change plans anytime?</p>
+                    <p class="faq-item__answer">Yes! Upgrade or downgrade your plan at any time. Changes take effect on your next billing cycle.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-item__question">Do you offer discounts for annual billing?</p>
+                    <p class="faq-item__answer">Absolutely. Annual plans include a 20% discount compared to monthly billing. Plus, you can adjust usage anytime.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-item__question">Is there a free trial?</p>
+                    <p class="faq-item__answer">Yes! We offer a 14-day free trial on the Pro plan with full access to all features. No credit card required.</p>
+                </div>
+
+                <div class="faq-item">
+                    <p class="faq-item__question">What payment methods do you accept?</p>
+                    <p class="faq-item__answer">We accept all major credit cards, PayPal, and bank transfers for annual plans.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        /**
+         * Pricing Calculator - Dynamic Logic
+         * Handles billing toggle, slider updates, and price calculations
+         */
+
+        const billingSwitch = document.getElementById('billingSwitch');
+        const billingMonthly = document.getElementById('billingMonthly');
+        const billingAnnual = document.getElementById('billingAnnual');
+        const quantitySlider = document.getElementById('quantitySlider');
+        const usersDisplay = document.getElementById('usersDisplay');
+        const totalDisplay = document.getElementById('totalDisplay');
+
+        const starterPrice = document.getElementById('starterPrice');
+        const proPrice = document.getElementById('proPrice');
+        const enterprisePrice = document.getElementById('enterprisePrice');
+
+        // Base prices (monthly)
+        const basePrices = {
+            starter: 29,
+            pro: 79,
+            enterprise: 199,
+        };
+
+        // Annual discount (20%)
+        const annualDiscount = 0.8;
+
+        let isBillingAnnual = false;
+
+        /**
+         * Handle billing toggle (Monthly / Annual)
+         */
+        billingSwitch.addEventListener('click', toggleBilling);
+
+        function toggleBilling() {
+            isBillingAnnual = !isBillingAnnual;
+            billingSwitch.classList.toggle('active');
+            
+            // Update radio buttons
+            if (isBillingAnnual) {
+                billingAnnual.checked = true;
+            } else {
+                billingMonthly.checked = true;
+            }
+
+            updatePrices();
+        }
+
+        /**
+         * Handle slider input
+         */
+        quantitySlider.addEventListener('input', handleSliderChange);
+
+        function handleSliderChange() {
+            const value = parseInt(quantitySlider.value);
+            usersDisplay.textContent = value;
+            updatePrices();
+        }
+
+        /**
+         * Calculate and update all prices
+         */
+        function updatePrices() {
+            const users = parseInt(quantitySlider.value);
+            
+            // Calculate per-user pricing (increases with quantity)
+            const perUserMultiplier = 1 + (users - 1) * 0.05; // Slight volume discount logic
+
+            // Calculate new prices
+            let starter = Math.round(basePrices.starter * perUserMultiplier);
+            let pro = Math.round(basePrices.pro * perUserMultiplier);
+            let enterprise = Math.round(basePrices.enterprise * perUserMultiplier);
+
+            // Apply annual discount if selected
+            if (isBillingAnnual) {
+                starter = Math.round(starter * annualDiscount);
+                pro = Math.round(pro * annualDiscount);
+                enterprise = Math.round(enterprise * annualDiscount);
+            }
+
+            // Update price displays
+            starterPrice.textContent = starter;
+            proPrice.textContent = pro;
+            enterprisePrice.textContent = enterprise;
+
+            // Calculate total monthly (Pro plan for display)
+            const totalMonthly = isBillingAnnual 
+                ? Math.round((pro * 12) / 12) 
+                : pro;
+
+            totalDisplay.textContent = '$' + totalMonthly;
+        }
+
+        // Initialize prices on load
+        updatePrices();
+
+        /**
+         * Smooth number animations on update
+         */
+        function animatePrice(element, newValue) {
+            const oldValue = parseInt(element.textContent);
+            const diff = newValue - oldValue;
+            const steps = 10;
+            const stepValue = diff / steps;
+            let current = 0;
+
+            const interval = setInterval(() => {
+                current++;
+                element.textContent = Math.round(oldValue + stepValue * current);
+                if (current >= steps) clearInterval(interval);
+            }, 30);
+        }
+    </script>
+</body>
+</html>
