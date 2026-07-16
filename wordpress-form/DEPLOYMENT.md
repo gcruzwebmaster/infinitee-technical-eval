@@ -162,9 +162,8 @@ Success Screen / Error Messages
 
 ---
 
-# Security
+## Security
 
-# Security
 
 The implementation follows WordPress security best practices to help protect against common web vulnerabilities while ensuring data integrity throughout the submission process.
 
