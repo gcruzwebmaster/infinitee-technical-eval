@@ -65,6 +65,24 @@ No business logic is stored in the template.
 
 ---
 
+## Request Flow
+
+Browser
+    ↓
+onboarding-form.js
+    ↓
+admin-ajax.php
+    ↓
+ajax-handler.php
+    ↓
+Validation
+    ↓
+Webhook Log
+    ↓
+JSON Response
+    ↓
+Success Screen
+
 ## functions.php
 
 Responsible for bootstrapping the component.
