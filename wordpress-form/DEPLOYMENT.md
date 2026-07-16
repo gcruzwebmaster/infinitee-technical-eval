@@ -128,6 +128,39 @@ Features include:
 - Dynamic success screen
 
 ---
+# Request Flow
+
+The following diagram illustrates how data flows through the application.
+
+```text
+User
+   │
+   ▼
+page-onboarding.php
+(Render Form)
+   │
+   ▼
+onboarding-form.js
+(Client-side Validation)
+   │
+   ▼
+Fetch API
+   │
+   ▼
+WordPress admin-ajax.php
+   │
+   ▼
+inc/ajax-handler.php
+   ├── Verify Nonce
+   ├── Sanitize Input
+   ├── Validate Fields
+   ├── Simulate Webhook
+   └── Return JSON Response
+   │
+   ▼
+Success Screen / Error Messages
+
+---
 
 # Security
 
