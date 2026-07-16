@@ -164,8 +164,35 @@ Success Screen / Error Messages
 
 # Security
 
-The implementation follows WordPress security best practices.
+# Security
 
+The implementation follows WordPress security best practices to help protect against common web vulnerabilities while ensuring data integrity throughout the submission process.
+
+## Nonce Verification
+
+Every AJAX request is protected using `check_ajax_referer()` to prevent Cross-Site Request Forgery (CSRF) attacks.
+
+## Input Sanitization
+
+All user input is sanitized using native WordPress functions such as:
+
+- `sanitize_text_field()`
+- `sanitize_email()`
+
+before any processing occurs.
+
+## Server-side Validation
+
+Although client-side validation improves the user experience, all submitted data is validated again on the server before being accepted.
+
+## Secure JSON Responses
+
+AJAX responses are returned using:
+
+- `wp_send_json_success()`
+- `wp_send_json_error()`
+
+to ensure consistent and properly formatted API responses.
 ## Nonce Verification
 
 Every AJAX request is verified using
