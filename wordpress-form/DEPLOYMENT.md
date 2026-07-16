@@ -1,386 +1,356 @@
-# Multi-Step Onboarding Form - WordPress Implementation
+# WordPress Onboarding Form Deployment Guide
 
 ## Overview
 
-This is a production-ready, security-hardened multi-step form component for WordPress. It demonstrates enterprise-grade web development practices including:
+This project is a custom multi-step onboarding form built for WordPress using a lightweight custom theme.
 
-- **Security:** Nonce-protected AJAX, server-side validation, input sanitization, and escaping
-- **Performance:** Lighthouse-optimized (targets 95+ Core Web Vitals score)
-- **Accessibility:** WCAG-compliant form structure with ARIA labels
-- **Code Quality:** Clean PHP, semantic HTML, and modular JavaScript
-- **User Experience:** Smooth multi-step flow with client-side validation and real-time feedback
+The implementation demonstrates:
+
+- Secure AJAX form submission
+- Server-side validation and sanitization
+- WordPress Nonce protection
+- Simulated webhook integration
+- Responsive multi-step UI
+- Modular theme architecture
+- No third-party form plugins
 
 ---
 
-## Architecture Overview
+# Live Demo
 
-### Component Structure
+Sandbox URL
 
-```
-onboarding-form/
-├── page-onboarding.php    # Custom page template with PHP logic
-├── css/
-│   └── onboarding-critical.css     # Optimized critical rendering CSS
-├── js/
-│   └── onboarding-form.js
-├── inc/
-│   └── ajax-handler.php          # Client-side form handler & validation
-└── README.md                       # This file
-```
+https://client.gracecruz.net/onboarding/
 
-### Data Flow
+---
+
+# Theme Structure
 
 ```
-User Input
-    ↓
-Client-Side Validation (JavaScript)
-    ↓
-AJAX Fetch Request (with Nonce)
-    ↓
-WordPress AJAX Handler (admin-ajax.php)
-    ↓
-Server-Side Validation & Sanitization
-    ↓
-Webhook Payload Simulation (JSON log)
-    ↓
-Success/Error Response
-    ↓
-DOM Update (no page reload)
+wp-content/
+└── themes/
+    └── infinitee-eval/
+        ├── style.css
+        ├── functions.php
+        ├── header.php
+        ├── footer.php
+        ├── index.php
+        ├── page-onboarding.php
+        ├── css/
+        │   └── onboarding.css
+        ├── js/
+        │   └── onboarding-form.js
+        └── inc/
+            └── ajax-handler.php
 ```
 
 ---
 
-## Deployment Instructions
+# Architecture Overview
 
-### Step 1: Prepare Your WordPress Installation
+The project follows separation of concerns.
 
-This component works on any standard WordPress installation (5.8+). You'll need:
-- FTP/SFTP access or file manager (cPanel/Kinsta dashboard)
-- Access to your active theme directory
+## page-onboarding.php
 
-### Step 2: Add the Template File
+Responsible only for rendering the onboarding interface.
 
-1. Connect via FTP/SFTP to your server
-2. Navigate to `/wp-content/themes/your-active-theme/`
-3. Upload `onboarding-form-template.php` to this directory
+Contains:
 
-**Important:** The template name `onboarding-form-template.php` allows WordPress to recognize it as a page template in the WordPress admin.
+- HTML markup
+- WordPress nonce field
+- Multi-step form
+- Success message container
 
-### Step 3: Add CSS and JavaScript
+No business logic is stored in the template.
 
-1. Create subdirectories in your theme:
-   ```
-   /wp-content/themes/your-active-theme/css/
-   /wp-content/themes/your-active-theme/js/
-   ```
+---
 
-2. Upload files:
-   - `onboarding-critical.css` → `/css/onboarding-critical.css`
-   - `onboarding-form.js` → `/js/onboarding-form.js`
+## functions.php
 
-### Step 4: Create a WordPress Page
+Responsible for bootstrapping the component.
 
-1. Log into WordPress admin
-2. Go to **Pages → Add New**
-3. Set the page title: "Onboarding"
-4. In the **Page Attributes** section (right sidebar), select the template:
-   - **Template:** Multi-Step Onboarding Form
-5. Publish the page
+Responsibilities include:
 
-The form will now be live at: `https://yoursite.com/onboarding/`
+- Loading CSS
+- Loading JavaScript
+- Registering localized AJAX variables
+- Loading AJAX handlers
 
-### Step 5: Verify Webhook Logging (Optional)
+Assets are only loaded when the onboarding template is being viewed.
 
-For testing, webhook payloads are logged to a text file. To verify:
+---
 
-1. Check `/wp-content/webhook-log.txt`
-2. In production, replace the file logging with an actual HTTP POST to your CRM:
+## ajax-handler.php
 
-```php
-wp_remote_post( 'https://your-crm-api.com/webhook', array(
-    'body'    => $webhook_payload,
-    'headers' => array( 'Content-Type' => 'application/json' ),
-    'timeout' => 10,
-));
+Handles all server-side processing.
+
+Responsibilities:
+
+- Verify WordPress Nonce
+- Sanitize all submitted values
+- Validate required fields
+- Simulate webhook logging
+- Return JSON success/error responses
+
+Keeping this logic isolated makes it reusable and easier to maintain.
+
+---
+
+## onboarding-form.js
+
+Handles the client-side experience.
+
+Features include:
+
+- Multi-step navigation
+- Progress indicator
+- Client-side validation
+- Fetch API submission
+- AJAX success/error handling
+- Dynamic success screen
+
+---
+
+# Security
+
+The implementation follows WordPress security best practices.
+
+## Nonce Verification
+
+Every AJAX request is verified using
+
+```
+
+check_ajax_referer()
+
+```
+
+to protect against CSRF attacks.
+
+---
+
+## Input Sanitization
+
+All incoming values are sanitized before processing.
+
+Examples:
+
+- sanitize_text_field()
+- sanitize_email()
+
+---
+
+## Server-side Validation
+
+Validation is performed again on the server regardless of client-side checks.
+
+This prevents malicious requests from bypassing browser validation.
+
+---
+
+## Safe JSON Responses
+
+Responses are returned using
+
+```
+
+wp_send_json_success()
+
+wp_send_json_error()
+
+```
+
+instead of manually echoing JSON.
+
+---
+
+# Webhook Simulation
+
+Instead of calling a live CRM endpoint, the submission is logged into
+
+```
+
+wp-content/webhook-log.txt
+
+```
+
+This simulates the payload that would normally be sent to an external CRM.
+
+Replacing this with
+
+```
+
+wp_remote_post()
+
+```
+
+would integrate directly with platforms such as HubSpot, ActiveCampaign or GoHighLevel.
+
+---
+
+# Deployment Steps
+
+## 1. Upload Theme
+
+Copy the theme folder
+
+```
+
+infinitee-eval
+
+```
+
+to
+
+```
+
+/wp-content/themes/
+
 ```
 
 ---
 
-## Security Architecture
+## 2. Activate Theme
 
-### 1. Nonce Protection
+WordPress Admin
 
-Every AJAX request includes a WordPress Nonce (Number Used Once). This prevents CSRF (Cross-Site Request Forgery) attacks:
+Appearance
 
-```php
-// In template: Generate nonce
-wp_create_nonce( 'onboarding_nonce' )
+Themes
 
-// In AJAX handler: Verify nonce
-check_ajax_referer( 'onboarding_nonce', 'nonce', true );
+Activate
+
 ```
 
-**What it does:** Only requests from your site with the correct nonce token are processed. Attackers can't forge requests from external sites.
+Infinitee Eval
 
-### 2. Input Sanitization
-
-All user inputs are sanitized before processing:
-
-```php
-$name     = sanitize_text_field( $_POST['name'] );    // Removes HTML/tags
-$email    = sanitize_email( $_POST['email'] );        // Validates email format
-$location = sanitize_text_field( $_POST['location'] ); // Removes HTML/tags
-```
-
-**What it does:** Strips out malicious scripts (e.g., `<script>alert('XSS')</script>`) and invalid characters.
-
-### 3. Output Escaping
-
-When displaying user data back to the page, it's escaped to prevent XSS:
-
-```php
-echo esc_attr( $name );  // Safe for HTML attributes
-echo esc_html( $email ); // Safe for text content
-```
-
-**What it does:** Even if a clever attacker somehow bypassed input sanitization, escaped output ensures their code can't execute.
-
-### 4. Server-Side Validation
-
-All validation happens on the server. Client-side validation provides UX only:
-
-```php
-if ( empty( $name ) ) {
-    wp_send_json_error( array( 'errors' => [ 'Name is required.' ] ) );
-}
-```
-
-**What it does:** Malicious users can't bypass client-side validation. All data is validated server-side before processing.
-
----
-
-## Performance Optimization (Lighthouse Strategy)
-
-### Critical Path Analysis
-
-To achieve Lighthouse 95+ performance score:
-
-#### 1. Inline Critical CSS
-```php
-wp_enqueue_style( 'onboarding-critical', 
-    get_template_directory_uri() . '/css/onboarding-critical.css', 
-    array(), '1.0.0' 
-);
-```
-- CSS is inline (not deferred) so the form displays without flickering
-- Minimal: Only styles needed for the fold (above-the-scroll)
-
-#### 2. Defer JavaScript
-```php
-wp_enqueue_script( 'onboarding-form', 
-    get_template_directory_uri() . '/js/onboarding-form.js', 
-    array(), '1.0.0', true  // true = defer in footer
-);
-```
-- JavaScript is loaded at the end of `</body>` to not block rendering
-- No render-blocking scripts on critical path
-
-#### 3. Minification & Compression
-For production, use:
-- **Autoptimize** plugin (automatically minifies CSS/JS)
-- **WP Rocket** or **Cloudflare** for asset caching
-- **Gzip compression** on your server (usually enabled by default)
-
-#### 4. Lazy Loading Images (if any added)
-```html
-<img src="image.jpg" loading="lazy" alt="Description" />
-```
-
-#### 5. No Blocking Third-Party Scripts
-The form doesn't load Google Fonts, Typekit, or external libraries. It uses system fonts for speed.
-
----
-
-## Troubleshooting Guide
-
-### Issue: Form not appearing on page
-
-**Diagnosis:**
-1. Check if page template was selected: Go to page edit → Page Attributes → is "Multi-Step Onboarding Form" selected?
-2. Check theme compatibility: Is `onboarding-form-template.php` in the correct theme folder?
-
-**Solution:**
-```bash
-# SSH into server and verify file exists:
-ls -la /var/www/html/wp-content/themes/your-theme/onboarding-form-template.php
-```
-
-### Issue: AJAX submission fails silently
-
-**Diagnosis:**
-1. Open browser console (F12 → Console tab)
-2. Look for JavaScript errors
-3. Check if nonce is missing or expired
-
-**Solution:**
-- Verify `wp_nonce_field()` is in the form template
-- Check browser console for error messages
-- Reload page if nonce is stale (over 12 hours old)
-
-### Issue: Webhook payload not logging
-
-**Diagnosis:**
-1. Check if `/wp-content/webhook-log.txt` exists and is writable
-2. Verify form submission is reaching server (check PHP error logs)
-
-**Solution:**
-```bash
-# SSH: Check file permissions
-chmod 666 /var/www/html/wp-content/webhook-log.txt
-
-# Or create if missing:
-touch /var/www/html/wp-content/webhook-log.txt
-chmod 666 /var/www/html/wp-content/webhook-log.txt
-```
-
-### Issue: Lighthouse score below 90
-
-**Diagnosis:**
-- Use Google Lighthouse tool (Chrome DevTools → Lighthouse tab)
-- Check for unused CSS/JS, unoptimized images, render-blocking resources
-
-**Solution:**
-- Enable Autoptimize for minification
-- Remove unused plugins that enqueue CSS/JS globally
-- Enable Cloudflare for caching
-- Optimize images with WP Smush
-
----
-
-## Code Explanation for Developers
-
-### How the Form Handles Data
-
-**Client-Side (JavaScript):**
-1. User fills 3 steps
-2. On "Submit," `handleFormSubmit()` collects form data
-3. Creates `URLSearchParams` object with name, email, location, nonce
-4. Sends `POST` to `/wp-admin/admin-ajax.php?action=onboarding_submit`
-
-**Server-Side (PHP):**
-1. WordPress routes to `handle_onboarding_submission()` function
-2. Verifies nonce with `check_ajax_referer()` (stops CSRF)
-3. Sanitizes inputs: `sanitize_text_field()`, `sanitize_email()`
-4. Validates: Checks for empty fields, valid email format
-5. Creates data object and JSON string
-6. Logs webhook payload to file (or sends to external API)
-7. Sends back `wp_send_json_success()` with confirmation
-
-**Database:** Form data is **not** stored in WordPress database in this implementation. It's only logged. For persistent storage, extend the code:
-
-```php
-$post_id = wp_insert_post( array(
-    'post_type'    => 'onboarding_submission',
-    'post_title'   => $email,
-    'post_content' => wp_json_encode( $data ),
-) );
 ```
 
 ---
 
-## Extending the Form
+## 3. Create Page
 
-### Add Database Storage
+Create a page called
 
-Create a custom post type to store submissions:
-
-```php
-register_post_type( 'onboarding_submission', array(
-    'label'  => 'Onboarding Submissions',
-    'public' => true,
-) );
 ```
 
-Then in `handle_onboarding_submission()`, add:
+Onboarding
 
-```php
-wp_insert_post( array(
-    'post_type'    => 'onboarding_submission',
-    'post_title'   => $email,
-    'post_content' => wp_json_encode( $data ),
-    'post_status'  => 'publish',
-) );
 ```
 
-### Send Confirmation Email
+Select the page template
 
-Add email confirmation in the AJAX handler:
-
-```php
-wp_mail( 
-    $email,
-    'Welcome to Our Platform',
-    'Thank you for your submission, ' . $name . '!'
-);
 ```
 
-### Connect to External CRM
+Multi-Step Onboarding Form
 
-Replace webhook logging with actual API call:
+```
 
-```php
-wp_remote_post( 'https://api.hubspot.com/crm/v3/objects/contacts', array(
-    'headers' => array(
-        'Authorization' => 'Bearer ' . HUBSPOT_API_KEY,
-        'Content-Type'  => 'application/json',
-    ),
-    'body' => wp_json_encode( array(
-        'properties' => array(
-            'firstname' => $name,
-            'email'     => $email,
-        ),
-    )),
-));
+Publish.
+
+---
+
+## 4. Verify Assets
+
+Confirm the browser loads
+
+```
+
+css/onboarding.css
+
+js/onboarding-form.js
+
 ```
 
 ---
 
-## File Structure & Deployment Checklist
+## 5. Test Form
 
-- [x] `onboarding-form-template.php` → `/wp-content/themes/your-theme/`
-- [x] `onboarding-critical.css` → `/wp-content/themes/your-theme/css/`
-- [x] `onboarding-form.js` → `/wp-content/themes/your-theme/js/`
-- [x] Create WordPress page with template selected
-- [x] Test form submission in browser
-- [x] Verify nonce protection (check browser console)
-- [x] Verify webhook logging works (check `/wp-content/webhook-log.txt`)
-- [x] Run Lighthouse audit (target 95+)
+Submit a test entry.
 
----
+Verify:
 
-## Performance Metrics
-
-**Expected Results (with optimization):**
-
-| Metric | Target | Notes |
-|--------|--------|-------|
-| Lighthouse Performance | 95+ | Deferred JS, critical CSS |
-| First Contentful Paint | < 1.0s | No render-blocking resources |
-| Largest Contentful Paint | < 2.5s | Critical CSS loaded immediately |
-| Cumulative Layout Shift | < 0.1 | No dynamic layout shifts |
+- validation works
+- success message appears
+- no page reload
+- webhook-log.txt receives a new payload
 
 ---
 
-## Support & Questions
+# Troubleshooting
 
-For troubleshooting:
-1. Check browser console (F12) for JavaScript errors
-2. Check WordPress error logs: `/wp-content/debug.log` (enable with `WP_DEBUG`)
-3. Verify file permissions: `chmod 755` for directories, `644` for files
-4. Test with a fresh WordPress theme (e.g., Twenty Twenty-Three) to rule out theme conflicts
+## CSS not loading
+
+Check:
+
+- Theme is active
+- Asset paths are correct
+- Browser cache has been cleared
 
 ---
 
-## License
+## AJAX not working
 
-This code is production-ready and follows WordPress security standards and best practices.
+Verify:
+
+- functions.php loads ajax-handler.php
+- admin-ajax.php returns JSON
+- Nonce matches
+- Browser console contains no JavaScript errors
+
+---
+
+## Webhook log missing
+
+Ensure
+
+```
+
+wp-content/
+
+```
+
+is writable.
+
+---
+
+# Performance
+
+The solution was designed with performance in mind.
+
+Features include:
+
+- Lightweight custom theme
+- Vanilla JavaScript
+- Fetch API
+- No jQuery dependency
+- No external UI libraries
+- Conditional asset loading
+- Minimal DOM manipulation
+
+---
+
+# Future Improvements
+
+This implementation can easily be extended by adding:
+
+- Database storage
+- Email notifications
+- HubSpot integration
+- Salesforce integration
+- GoHighLevel integration
+- Spam protection
+- reCAPTCHA
+- Multi-language support
+
+---
+
+# Author
+
+Grace Cruz
+
+Senior Web Developer
+
+https://gracecruz.net
+
+https://codewisestudio.com
