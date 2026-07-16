@@ -1,5 +1,3 @@
----
-
 ## Deployment Instructions
 
 ### Step 1: Prepare Your WordPress Installation
